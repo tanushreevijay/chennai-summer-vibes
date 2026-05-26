@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
+from google.api_core import exceptions as google_exceptions
 
 load_dotenv()
 
@@ -91,13 +92,24 @@ async def generate_suggestion(category: str | None = None) -> Suggestion:
         category = random.choice(CATEGORIES)
 
     model = genai.GenerativeModel("gemini-2.0-flash")
-    response = model.generate_content(
-        SUGGESTION_PROMPT.format(category=category),
-        generation_config=genai.types.GenerationConfig(
-            temperature=1.2,
-            max_output_tokens=500,
-        ),
-    )
+    try:
+        response = model.generate_content(
+            SUGGESTION_PROMPT.format(category=category),
+            generation_config=genai.types.GenerationConfig(
+                temperature=1.2,
+                max_output_tokens=500,
+            ),
+        )
+    except google_exceptions.ResourceExhausted:
+        raise HTTPException(
+            status_code=429,
+            detail="Gemini API rate limit reached. Please wait a minute and try again.",
+        )
+    except google_exceptions.GoogleAPIError as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Gemini API error: {e}",
+        )
 
     try:
         text = response.text.strip()
