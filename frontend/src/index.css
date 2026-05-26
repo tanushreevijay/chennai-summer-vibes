@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --pink: #FFB5C2;
+  --pink-light: #FFD4DC;
+  --lavender: #C3AED6;
+  --lavender-light: #E0D4F0;
+  --mint: #B5EAD7;
+  --mint-light: #D4F5E9;
+  --peach: #FFDAB9;
+  --peach-light: #FFE8D0;
+  --sky: #B5D8F7;
+  --sky-light: #D4ECFF;
+  --yellow: #FFF5BA;
+  --yellow-light: #FFFAD4;
+  --cream: #FFF8F0;
+  --text-primary: #4A4A4A;
+  --text-secondary: #7A7A7A;
+  --card-shadow: 0 8px 32px rgba(180, 160, 200, 0.15);
+  --card-shadow-hover: 0 12px 40px rgba(180, 160, 200, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background: linear-gradient(135deg, var(--cream) 0%, var(--pink-light) 30%, var(--lavender-light) 60%, var(--sky-light) 100%);
+  min-height: 100vh;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
