@@ -3,12 +3,12 @@ import './App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-const ACCENT_COLORS = ['pink', 'lavender', 'mint', 'peach', 'sky'];
+const PALETTES = ['blush', 'sage', 'mauve', 'honey', 'blue'];
 
-function getAccentColor(category) {
-  if (!category) return 'lavender';
-  const hash = category.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return ACCENT_COLORS[hash % ACCENT_COLORS.length];
+function getPalette(category) {
+  if (!category) return 'blush';
+  const hash = category.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return PALETTES[hash % PALETTES.length];
 }
 
 function formatDate() {
@@ -21,9 +21,9 @@ function formatDate() {
 
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return 'good morning, sunshine';
+  if (hour < 17) return 'hey there, lovely';
+  return 'good evening, babe';
 }
 
 function App() {
@@ -42,10 +42,9 @@ function App() {
       const res = await fetch(`${API_URL}/suggestion/today`);
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || 'Failed to fetch suggestion');
+        throw new Error(data.detail || 'something went wrong');
       }
-      const data = await res.json();
-      setSuggestion(data);
+      setSuggestion(await res.json());
     } catch (err) {
       setError(err.message);
     } finally {
@@ -64,10 +63,9 @@ function App() {
       const res = await fetch(url);
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.detail || 'Failed to fetch suggestion');
+        throw new Error(data.detail || 'something went wrong');
       }
-      const data = await res.json();
-      setSuggestion(data);
+      setSuggestion(await res.json());
     } catch (err) {
       setError(err.message);
     } finally {
@@ -81,7 +79,7 @@ function App() {
       const data = await res.json();
       setCategories(data.categories || []);
     } catch {
-      // silently fail
+      /* noop */
     }
   }, []);
 
@@ -108,34 +106,31 @@ function App() {
     setShowInstallBanner(false);
   };
 
-  const accent = suggestion ? getAccentColor(suggestion.category) : 'lavender';
+  const palette = suggestion ? getPalette(suggestion.category) : 'blush';
 
   return (
     <div className="app">
       <header className="header">
-        <span className="header-emoji" role="img" aria-label="sun">
-          &#x1F334;
-        </span>
-        <h1>Chennai Summer Vibes</h1>
-        <p className="subtitle">{getGreeting()}! Here&apos;s your vibe for today</p>
+        <p className="header-deco">~ chennai ~</p>
+        <h1>Summer <em>Vibes</em></h1>
+        <p className="header-sub">{getGreeting()}</p>
       </header>
 
-      <div className="date-badge">
-        <span role="img" aria-label="calendar">&#x1F4C5;</span>
-        {formatDate()}
+      <div className="date-strip">
+        <span>{formatDate()}</span>
       </div>
 
       {showInstallBanner && (
-        <div className="install-prompt">
-          <div className="install-prompt-text">
-            Add to Home Screen
-            <span>Get daily vibes on your phone!</span>
+        <div className="install-banner">
+          <div className="install-banner-text">
+            add to your home screen
+            <span>wake up to a new vibe every day</span>
           </div>
           <button className="btn-install" onClick={handleInstall}>
-            Install
+            install
           </button>
           <button
-            className="btn-dismiss"
+            className="btn-close"
             onClick={() => setShowInstallBanner(false)}
             aria-label="Dismiss"
           >
@@ -145,74 +140,77 @@ function App() {
       )}
 
       {loading && (
-        <div className="loading-card">
-          <span className="loading-emoji" role="img" aria-label="sparkles">
-            &#x2728;
-          </span>
-          <p className="loading-text">Finding something fun for you...</p>
+        <div className="loading-state">
+          <div className="loading-dots">
+            <span />
+            <span />
+            <span />
+          </div>
+          <p>finding your perfect vibe...</p>
         </div>
       )}
 
       {error && !loading && (
-        <div className="error-card">
-          <span className="error-emoji" role="img" aria-label="sad">
-            &#x1F625;
-          </span>
-          <p className="error-text">{error}</p>
-          <button className="btn-refresh" onClick={fetchTodaySuggestion}>
-            Try Again
+        <div className="error-state">
+          <p>oops — {error}</p>
+          <button className="btn-primary" onClick={fetchTodaySuggestion}>
+            try again
           </button>
         </div>
       )}
 
       {suggestion && !loading && !error && (
         <div className="suggestion-card" key={suggestion.title}>
-          <div className={`card-accent ${accent}`} />
-          <span className="card-emoji" role="img" aria-label="activity">
-            {suggestion.emoji}
-          </span>
-          <span className={`card-category ${accent}`}>
-            {suggestion.category}
-          </span>
+          <div className="card-top">
+            <div className={`card-emoji-wrap ${palette}`}>
+              {suggestion.emoji}
+            </div>
+            <span className={`card-badge ${palette}`}>
+              {suggestion.category}
+            </span>
+          </div>
+
           <h2 className="card-title">{suggestion.title}</h2>
-          <p className="card-description">{suggestion.description}</p>
-          <div className="card-meta">
-            <span className="meta-tag">
-              <span role="img" aria-label="clock">&#x1F570;&#xFE0F;</span>
-              {suggestion.best_time}
-            </span>
-            <span className="meta-tag">
-              <span role="img" aria-label="vibe">&#x2728;</span>
-              {suggestion.vibe}
-            </span>
+          <p className="card-desc">{suggestion.description}</p>
+
+          <div className="card-details">
+            <div className="card-detail">
+              <span className="card-detail-label">best time</span>
+              <span className="card-detail-value">{suggestion.best_time}</span>
+            </div>
+            <div className="card-detail">
+              <span className="card-detail-label">vibe</span>
+              <span className="card-detail-value">{suggestion.vibe}</span>
+            </div>
           </div>
         </div>
       )}
 
-      <div className="button-group">
+      <div className="actions">
         <button
-          className="btn-refresh"
+          className="btn-primary"
           onClick={() => fetchNewSuggestion()}
           disabled={loading}
         >
-          <span role="img" aria-label="shuffle">&#x1F500;</span>
-          {loading ? 'Loading...' : 'Surprise Me!'}
+          {loading ? 'finding...' : 'surprise me'}
         </button>
         <button
-          className="btn-category"
+          className="btn-secondary"
           onClick={() => setShowCategories(!showCategories)}
+          aria-label="Pick a category"
         >
-          <span role="img" aria-label="categories">&#x1F3AF;</span>
+          +
         </button>
       </div>
 
       {showCategories && categories.length > 0 && (
-        <div className="category-picker">
-          <div className="category-grid">
+        <div className="category-section">
+          <p className="category-section-title">pick a mood</p>
+          <div className="category-list">
             {categories.map((cat) => (
               <button
                 key={cat}
-                className="category-chip"
+                className="category-pill"
                 onClick={() => fetchNewSuggestion(cat)}
               >
                 {cat}
@@ -223,7 +221,7 @@ function App() {
       )}
 
       <footer className="footer">
-        <p>Made with love for Chennai summers</p>
+        <p>made with love for chennai girls</p>
       </footer>
     </div>
   );

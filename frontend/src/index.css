@@ -1,23 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
 
 :root {
-  --pink: #FFB5C2;
-  --pink-light: #FFD4DC;
-  --lavender: #C3AED6;
-  --lavender-light: #E0D4F0;
-  --mint: #B5EAD7;
-  --mint-light: #D4F5E9;
-  --peach: #FFDAB9;
-  --peach-light: #FFE8D0;
-  --sky: #B5D8F7;
-  --sky-light: #D4ECFF;
-  --yellow: #FFF5BA;
-  --yellow-light: #FFFAD4;
-  --cream: #FFF8F0;
-  --text-primary: #4A4A4A;
-  --text-secondary: #7A7A7A;
-  --card-shadow: 0 8px 32px rgba(180, 160, 200, 0.15);
-  --card-shadow-hover: 0 12px 40px rgba(180, 160, 200, 0.25);
+  --blush: #F2C4C4;
+  --blush-soft: #FAE0E0;
+  --rose: #E8A0A0;
+  --cream: #FDF6F0;
+  --warm-white: #FFFBF7;
+  --latte: #F5E6D3;
+  --sage: #C8D5C0;
+  --sage-soft: #E3EBE0;
+  --dusty-blue: #B8C9D9;
+  --dusty-blue-soft: #D6E3ED;
+  --mauve: #D4B5C7;
+  --mauve-soft: #EADAE4;
+  --honey: #F0D9A0;
+  --honey-soft: #F8EDD0;
+  --terracotta: #D4A088;
+  --text-dark: #3D3535;
+  --text-warm: #6B5B5B;
+  --text-muted: #9B8B8B;
+  --card-shadow: 0 2px 20px rgba(210, 180, 170, 0.12);
 }
 
 * {
@@ -27,11 +29,12 @@
 }
 
 body {
-  font-family: 'Quicksand', sans-serif;
-  background: linear-gradient(135deg, var(--cream) 0%, var(--pink-light) 30%, var(--lavender-light) 60%, var(--sky-light) 100%);
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background-color: var(--cream);
   min-height: 100vh;
-  color: var(--text-primary);
+  color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 #root {
