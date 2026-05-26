@@ -90,7 +90,7 @@ async def generate_suggestion(category: str | None = None) -> Suggestion:
     if category is None:
         category = random.choice(CATEGORIES)
 
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(
         SUGGESTION_PROMPT.format(category=category),
         generation_config=genai.types.GenerationConfig(
