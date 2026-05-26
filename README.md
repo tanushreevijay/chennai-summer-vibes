@@ -14,7 +14,7 @@ A cute pastel PWA that suggests fun, creative things to do in Chennai during sum
 ## Tech Stack
 
 - **Backend**: Python / FastAPI
-- **AI**: Google Gemini (1.5 Flash) for creative suggestions
+- **AI**: Groq (Llama 3.3 70B) for creative suggestions
 - **Frontend**: React (Vite) PWA
 - **Styling**: Custom CSS with pastel design system
 
@@ -28,14 +28,14 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Create .env file with your Gemini API key
+# Create .env file with your Groq API key
 cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
+# Edit .env and add your GROQ_API_KEY
 
 uvicorn main:app --reload --port 8000
 ```
 
-Get a free Gemini API key at: https://aistudio.google.com/apikey
+Get a free Groq API key at: https://console.groq.com/keys
 
 ### Frontend
 
@@ -70,5 +70,5 @@ npm run build
 
 | Variable | Description |
 |---|---|
-| `GEMINI_API_KEY` | Your Google Gemini API key |
+| `GROQ_API_KEY` | Your Groq API key |
 | `VITE_API_URL` | Backend API URL (frontend, defaults to `http://localhost:8000`) |

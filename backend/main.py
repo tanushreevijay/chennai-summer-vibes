@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import google.generativeai as genai
-from google.api_core import exceptions as google_exceptions
+from groq import Groq, RateLimitError, APIError
 
 load_dotenv()
 
@@ -22,7 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 CATEGORIES = [
     "exploring hidden gems",
@@ -80,47 +79,47 @@ daily_cache: dict[str, Suggestion] = {}
 
 
 async def generate_suggestion(category: str | None = None) -> Suggestion:
-    if not GEMINI_API_KEY:
+    if not GROQ_API_KEY:
         raise HTTPException(
             status_code=500,
-            detail="GEMINI_API_KEY not configured. Please set it in your .env file.",
+            detail="GROQ_API_KEY not configured. Please set it in your .env file.",
         )
 
-    genai.configure(api_key=GEMINI_API_KEY)
+    client = Groq(api_key=GROQ_API_KEY)
 
     if category is None:
         category = random.choice(CATEGORIES)
 
-    model = genai.GenerativeModel("gemini-2.0-flash")
     try:
-        response = model.generate_content(
-            SUGGESTION_PROMPT.format(category=category),
-            generation_config=genai.types.GenerationConfig(
-                temperature=1.2,
-                max_output_tokens=500,
-            ),
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a fun, creative lifestyle assistant. Respond only with valid JSON.",
+                },
+                {
+                    "role": "user",
+                    "content": SUGGESTION_PROMPT.format(category=category),
+                },
+            ],
+            temperature=1.2,
+            max_completion_tokens=500,
+            response_format={"type": "json_object"},
         )
-    except google_exceptions.ResourceExhausted:
+    except RateLimitError:
         raise HTTPException(
             status_code=429,
-            detail="Gemini API rate limit reached. Please wait a minute and try again.",
+            detail="AI rate limit reached. Please wait a minute and try again.",
         )
-    except google_exceptions.GoogleAPIError as e:
+    except APIError as e:
         raise HTTPException(
             status_code=502,
-            detail=f"Gemini API error: {e}",
+            detail=f"AI API error: {e}",
         )
 
     try:
-        text = response.text.strip()
-        if text.startswith("```json"):
-            text = text[7:]
-        if text.startswith("```"):
-            text = text[3:]
-        if text.endswith("```"):
-            text = text[:-3]
-        text = text.strip()
-
+        text = response.choices[0].message.content.strip()
         data = json.loads(text)
         return Suggestion(
             title=data["title"],
@@ -141,7 +140,7 @@ async def generate_suggestion(category: str | None = None) -> Suggestion:
 @app.get("/")
 async def root():
     return {
-        "message": "🌴 Chennai Summer Vibes API",
+        "message": "Chennai Summer Vibes API",
         "version": "1.0.0",
         "endpoints": {
             "/suggestion/today": "Get today's daily suggestion",
@@ -180,5 +179,5 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "gemini_configured": bool(GEMINI_API_KEY),
+        "groq_configured": bool(GROQ_API_KEY),
     }
